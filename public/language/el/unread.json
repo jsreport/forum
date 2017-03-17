@@ -1,0 +1,13 @@
+{
+    "title": "Μη αναγνωσμένα",
+    "no_unread_topics": "Δεν υπάρχουν μη αναγνωσμένα θέματα.",
+    "load_more": "Φόρτωση Περισσότερων",
+    "mark_as_read": "Σημείωση ώς Αναγνωσμένα",
+    "selected": "Επιλεγμένα",
+    "all": "Όλα",
+    "all_categories": "All categories",
+    "topics_marked_as_read.success": "Τα θέματα σημειώθηκαν ως αναγνωσμένα!",
+    "all-topics": "All Topics",
+    "new-topics": "New Topics",
+    "watched-topics": "Watched Topics"
+}

@@ -1,0 +1,20 @@
+{
+	"queue": "File d'attente",
+	"description": "Il n'y a aucun utilisateur dans la file d'inscription.<br> Pour activer cette fonctionnalité, allez dans <a href=\"%1\">Paramètres &rarr; Utilisateurs &rarr; inscription des utilisateurs</a> et définissez <strong>Type d'inscription</strong> en \"Approbation par l'administrateur\".",
+
+	"list.name": "Nom",
+	"list.email": "E-mail",
+	"list.ip": "IP",
+	"list.time": "Date",
+	"list.username-spam": "Frequency: %1 Appears: %2 Confidence: %3",
+	"list.email-spam": "Frequency: %1 Appears: %2",
+	"list.ip-spam": "Frequency: %1 Appears: %2",
+
+	"invitations": "Invitations",
+	"invitations.description": "Below is a complete list of invitations sent. Use ctrl-f to search through the list by email or username. <br><br>The username will be displayed to the right of the emails for users who have redeemed their invitations.",
+	"invitations.inviter-username": "Inviter Username",
+	"invitations.invitee-email": "Invitee Email",
+	"invitations.invitee-username": "Invitee Username (if registered)",
+
+	"invitations.confirm-delete": "Êtes-vous sûr de vouloir supprimer l'invitation ?"
+} 

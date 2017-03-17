@@ -1,0 +1,27 @@
+{
+	"icon": "Icon:",
+	"change-icon": "ändern",
+	"route": "Pfad:",
+	"tooltip": "Tooltip:",
+	"text": "Text:",
+	"text-class": "Text Stil: <small>optional</small>",
+	"id": "ID: <small>optional</small>",
+
+	"properties": "Eigenschaften:",
+	"only-admins": "Nur sichtbar für Admins",
+	"only-global-mods-and-admins": "Nur sichtbar für Globale Moderatoren und Admins",
+	"only-logged-in": "Nur sichtbar für angemeldete Benutzer",
+	"open-new-window": "In neuem Fenster öffnen",
+
+	"installed-plugins-required": "Installierte Plugins notwendig:",
+	"search-plugin": "Search plugin",
+
+	"btn.delete": "Löschen",
+	"btn.disable": "Deaktivieren",
+	"btn.enable": "Aktivieren",
+
+	"available-menu-items": "Verfügbare Menüpunkte",
+	"custom-route": "Benutzerdefinierter Pfad",
+	"core": "Kern",
+	"plugin": "Plugin"
+}

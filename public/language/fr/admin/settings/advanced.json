@@ -1,0 +1,19 @@
+{
+	"maintenance-mode": "Mode maintenance",
+	"maintenance-mode.help": "Quand le forum est en mode maintenance, toutes les requêtes sont redirigées vers une page de garde statique. Les administrateurs sont exemptés de cette redirection et peuvent accéder normalement au site. ",
+	"maintenance-mode.message": "Message de maintenance",
+	"headers": "En-têtes",
+	"headers.allow-from": "Définissez ALLOW-FROM pour afficher NodeBB dans un iFrame",
+	"headers.powered-by": "Personnaliser l'en-tête \"Propulsé par\" envoyé par NodeBB",
+	"headers.acao": "Access-Control-Allow-Origin",
+	"headers.acao-help": "Pour interdire l'accès à tous les sites, laisser vide ou définissez comme <code>null</code>",
+	"headers.acam": "Access-Control-Allow-Methods",
+	"headers.acah": "Access-Control-Allow-Headers",
+	"traffic-management": "Gestion du trafic",
+	"traffic.help": "NodeBB deploys equipped with a module that automatically denies requests in high-traffic situations. You can tune these settings here, although the defaults are a good starting point.",
+	"traffic.enable": "Activé la gestion du trafic",
+	"traffic.event-lag": "Event Loop Lag Threshold (in milliseconds)",
+	"traffic.event-lag-help": "Lowering this value decreases wait times for page loads, but will also show the \"excessive load\" message to more users. (Restart required)",
+	"traffic.lag-check-interval": "Vérifier l’intervalle (en millisecondes)",
+	"traffic.lag-check-interval-help": "Lowering this value causes NodeBB to become more sensitive to spikes in load, but may also cause the check to become too sensitive. (Restart required)"
+}
