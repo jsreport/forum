@@ -121,7 +121,7 @@ function resizeImage(fileObj, callback) {
 			var extname = path.extname(fileObj.url);
 			var basename = path.basename(fileObj.url, extname);
 
-			fileObj.url = path.join(dirname, basename + '-resized' + extname);
+			fileObj.url = dirname + '/' + basename + '-resized' + extname;
 
 			next(null, fileObj);
 		}
@@ -219,7 +219,7 @@ function saveFileToLocal(uploadedFile, callback) {
 		if (err) {
 			return callback(err);
 		}
-
+		
 		callback(null, {
 			url: nconf.get('relative_path') + upload.url,
 			path: upload.path,
