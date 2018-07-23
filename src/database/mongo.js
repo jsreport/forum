@@ -80,7 +80,8 @@
 			servers.push(hosts[i] + ':' + ports[i]);
 		}
 
-		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + (nconf.get('mongo:database') || nconf.get('mongo:authDatabase'));
+		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + (nconf.get('mongo:authDatabase') || nconf.get('mongo:database'));
+		winston.info('Connecting to ' + connString);
 
 		var connOptions = {
 			server: {
