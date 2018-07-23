@@ -10,7 +10,7 @@
   },
   "main": "app.js",
   "scripts": {
-    "start": "node loader.js",  
+    "start": "node loader.js"  
   },
   "dependencies": {
     "async": "~1.5.0",
