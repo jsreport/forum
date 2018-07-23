@@ -1,30 +1,17 @@
-services:
-  - redis-server
-before_install:
-  - "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10"
-  - "echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list"
-  - "sudo apt-get update"
-  - "sudo apt-get install mongodb-org-server"
-before_script:
-  - sh -c "if [ '$DB' = 'mongodb' ]; then node app --setup=\"{\\\"url\\\":\\\"http://127.0.0.1:4567\\\",\\\"secret\\\":\\\"abcdef\\\",\\\"database\\\":\\\"mongo\\\",\\\"mongo:host\\\":\\\"127.0.0.1\\\",\\\"mongo:port\\\":27017,\\\"mongo:username\\\":\\\"\\\",\\\"mongo:password\\\":\\\"\\\",\\\"mongo:database\\\":0,\\\"redis:host\\\":\\\"127.0.0.1\\\",\\\"redis:port\\\":6379,\\\"redis:password\\\":\\\"\\\",\\\"redis:database\\\":0,\\\"admin:username\\\":\\\"admin\\\",\\\"admin:email\\\":\\\"test@example.org\\\",\\\"admin:password\\\":\\\"abcdef\\\",\\\"admin:password:confirm\\\":\\\"abcdef\\\"}\" --ci=\"{\\\"host\\\":\\\"127.0.0.1\\\",\\\"port\\\":27017,\\\"database\\\":0}\"; fi"
-  - sh -c "if [ '$DB' = 'redis' ]; then node app --setup=\"{\\\"url\\\":\\\"http://127.0.0.1:4567\\\",\\\"secret\\\":\\\"abcdef\\\",\\\"database\\\":\\\"redis\\\",\\\"mongo:host\\\":\\\"127.0.0.1\\\",\\\"mongo:port\\\":27017,\\\"mongo:username\\\":\\\"\\\",\\\"mongo:password\\\":\\\"\\\",\\\"mongo:database\\\":0,\\\"redis:host\\\":\\\"127.0.0.1\\\",\\\"redis:port\\\":6379,\\\"redis:password\\\":\\\"\\\",\\\"redis:database\\\":0,\\\"admin:username\\\":\\\"admin\\\",\\\"admin:email\\\":\\\"test@example.org\\\",\\\"admin:password\\\":\\\"abcdef\\\",\\\"admin:password:confirm\\\":\\\"abcdef\\\"}\" --ci=\"{\\\"host\\\":\\\"127.0.0.1\\\",\\\"port\\\":6379,\\\"database\\\":0}\"; fi"
-  - "until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done"
-after_success:
-  - "npm run coveralls"
+sudo: required
 language: node_js
-env:
-  - CXX=g++-4.8 DB=mongodb
-  - CXX=g++-4.8 DB=redis
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-4.8
 node_js:
-  - "6"
-  - "4"
-branches:
-  only:
-    - master
-    - develop
+- '8'
+services:
+- docker
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: bash deploy.sh
+  on:
+    tags: true
+env:
+  global:
+  - secure: UL3oiZM+VzQUKrqnd8G1c1AfUG4iiK0zclTBDebuz9hxQ/Bps5i98l/xFsXDbSa1Sgpv4jQEGyyAQGHwRMxTyfVTJlDI2ZmKGzQBsHMQpmHJvlvQaeDHVyJFNrOpUNYAb50yJeL5Gf6E3V2PES+wshVS5sZMeDTdALh9swbj7s7NnvphF56KnoUAkWwKv+KgUDsnskVSb1FOppgehzPCz1EOHJNkPuRlZrGqm41H2/2fWmtIkKRF31lWwhf9ZNwYbiLozzmX6PerMK2kViOH1xkAceO2wQvZJgt5PyP2balvj/p+j/B6SbQHT4ce2vZlzJ3D1DwMQJyRcyTGgF9CCa70D763vRJQlEhe7rRM08WTBhO9JHYScYX6fL50H71WMe4KN6zmyNSEOdSu5vm8pTyLwBSRDXgeIWmeaeEW6SKsuxGg2UereaA68ACVtO6Be6kD/Xii/f9DLZRllMVzsUxj0m8MIYQqxjGuWiFAuoEuBr09+AHLQkM60gBt583AhgDBsVYVKvGqmUvSMvPsayS78tE5A2hZJr6PKLJIw/ggriXA5OJnXmqrOXw6YHIpdWn6UJqUy3kr9s51HEEgHEqMxEyFtUzFQdi+3JnMEl3zKgB+stl57TWjU9g/8kyUSDbpX4K+KQH65R8TxPUd8K8X2u1BvRnYFJbgrmUZHBs=
+  - secure: fjtt4l1hx700sIKs4sW/3OkHXkS0Cm+ekzRX2oQ0v8WIcCU9BLoEoOXVl6XIzOSIBi+qWaliLxjAvzeipqvu6QRS1VAQyseQ8X70ZkaWquLKYvMVtqs825NdkO0K7wyIA7F38RF8Sb5s43SlqhEi/0ssCpupEl48QEwk0IG4kWhBRe2NPisuwlAaKFL81hNtM5UC9TZlmw9PbmF9Aw5KDblw/TTaj4ZtxQrP6R0GRzQCUzgLOVE2WlPEKDtDeS7/0ejAqsU3rgwcxZFGd5+vdy8cEzS2HBnCGDPmbjouDvnA3cM8SmyQ2z9OlDHSxAcioZI4U0JTFckTTwnQFpbPwKICFbo8fPp4O9+59yiLa8PLU5Lnfq0XjGAbCPz8gQpLRU1qaAt2UXgD4OWNFIrOJQUaUp1N5EeOItdSH513Jad+LIdCk6/AbtGsXNEleX6v8yhNBQaX90QEFCoETnkL+PQoEa+H2OJ/vJ+d9EhDReLHFfKpjDSjy8CxIrnTF87OQbCaWSSARmTUleDrR19iQxdMu7DAZ+t4iyMXrNhE/fGF1uz6usKUpT0OJlWHM1tnCnkf1FrI//+dUUO/P5wno/aH8MSXroOUMCaN7/j02wI8KgTXFVQfVgeO0K4tHQSiWuF6bY5Y/trxDUNfri/OWUnzCVBiepH/6h0sKdcLsxA=
+  - secure: R4WDQG5bn1moRaVyjqt/hkGgPdmtOh7q7dQFtqdslT28g9i9XSTd0WV7sm3cRjodrWh+2ygwT7pXy1Tsf3lZ57mFIBch+kZ2J4mJ+7UFQKfhdpnKJJlMJQGT4FmXFOURFs+Jc/mLznIE7PNFwkj5ZKj0T0wvQbbGZmt5Cjf0fMvk/k/wkqjf9Ebe9TWOyJpMyh/FuHVryU6GxD4pMdnVI1UAQpNoqVaw4T5kjYqdlTu8KdxckOgvgY/5RxPTvh/KG4A56TcPmaQxN3Tck+hGc6nTFzM2ILNFvdukqmV7QHIoPbuy4qaIEwTHIE+aBYF+Ro4iiz5twJjf9YmkyEC0DN1eUVYoCi1806ZEPQrUdNzhzlywld+8DM+dcito2srAld3Yk06lgK4f93yD29Om8rp/DOMWGexwbDph7n60noM+iA+/i8qCK0C/EMUjubtVFpPJNcXqU2dU1au/RYpPfslCZW5RNRYFaGbH6JPWX2TpkvP/h/8lgWrst3pxicSaXvZFJvZErLyM1nb2+4wOf6gAQH562mhkH94cdbs6McKEVgX3u5p8rZiz/9+oii8LFT1Qab6NAoIVxqb/u4E3FHuzylAhSbX/qqBJLQZqtec5ZDYx8o7oUj85hCBAD3AKXS9xgX2MVSWerQryC87WJ67yhl94jeWA2rryc1C+6Ac=
