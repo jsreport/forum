@@ -17,6 +17,8 @@ provision.sh
 feeds/recent.rss
 .eslintcache
 
+build
+
 logs/
 
 pidfile
