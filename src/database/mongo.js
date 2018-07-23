@@ -80,7 +80,7 @@
 			servers.push(hosts[i] + ':' + ports[i]);
 		}
 
-		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + nconf.get('mongo:database');
+		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + (nconf.get('mongo:database') || nconf.get('mongo:authDatabase'));
 
 		var connOptions = {
 			server: {
@@ -94,9 +94,13 @@
 			if (err) {
 				winston.error("NodeBB could not connect to your Mongo database. Mongo returned the following error: " + err.message);
 				return callback(err);
-			}
+			}			
 
 			db = _db;
+
+			if (nconf.get('mongo:authDatabase')) {
+				db = db.db(nconf.get('mongo:database'));
+			}
 
 			module.client = db;
 
@@ -106,7 +110,9 @@
 			require('./mongo/sorted')(db, module);
 			require('./mongo/list')(db, module);
 
-			if (nconf.get('mongo:password') && nconf.get('mongo:username')) {
+			callback();
+
+			/*if (nconf.get('mongo:password') && nconf.get('mongo:username')) {
 				db.authenticate(nconf.get('mongo:username'), nconf.get('mongo:password'), function (err) {
 					if (err) {
 						return callback(err);
@@ -116,7 +122,7 @@
 			} else {
 				winston.warn('You have no mongo password setup!');
 				callback();
-			}
+			}*/
 		});
 	};
 
