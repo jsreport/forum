@@ -21,20 +21,6 @@
 /*global require, global, process*/
 
 var path = require('path');
-require.main._req = require.main.require;
-
-require.main.require = function (mod) {
-    if ((mod.startsWith('./') || mod.startsWith('/'))) {
-        var fullPath = path.join(__dirname,'\\',mod);
-        return require.main._req(fullPath);
-    }
-	
-	try {
-		return require.main._req(mod);
-	} catch (e) {
-		return require(mod);
-	}
-};
 
 var nconf = require('nconf');
 nconf.argv().env('__');
