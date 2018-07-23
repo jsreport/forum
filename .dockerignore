@@ -21,22 +21,6 @@ logs/
 
 pidfile
 
-# templates
-/public/templates
-
-/public/sounds
-
-# compiled files
-/public/stylesheet.css
-/public/admin.css
-/public/nodebb.min.js
-/public/nodebb.min.js.map
-/public/acp.min.js
-/public/acp.min.js.map
-/public/installer.css
-/public/installer.min.js
-/public/logo.png
-
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 *.iml
 
