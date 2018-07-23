@@ -9,4 +9,4 @@ COPY . .
 RUN mkdir logs
 
 EXPOSE 4567
-CMD [ "node", "app.js" ]
+CMD node nodebb build && node app.js

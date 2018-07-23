@@ -222,7 +222,8 @@ fs.open(path.join(__dirname, 'config.json'), 'r', function (err) {
 
 			require('daemon')({
 				stdout: process.stdout,
-				stderr: process.stderr
+				stderr: process.stderr,
+				cwd: process.cwd()
 			});
 
 			fs.writeFile(__dirname + '/pidfile', process.pid);
