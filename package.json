@@ -10,7 +10,7 @@
   },
   "main": "app.js",
   "scripts": {
-    "start": "node loader.js"  
+    "start": "node loader.js"
   },
   "dependencies": {
     "async": "~1.5.0",
@@ -48,7 +48,7 @@
     "morgan": "^1.3.2",
     "mousetrap": "^1.5.3",
     "nconf": "~0.8.2",
-    "nodebb-plugin-category-notifications": "3.0.0",
+    "nodebb-plugin-category-notifications": "2.0.3",
     "nodebb-plugin-composer-default": "4.3.8",
     "nodebb-plugin-dbsearch": "1.0.5",
     "nodebb-plugin-emailer-sendgrid": "2.0.3",
