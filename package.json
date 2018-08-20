@@ -60,7 +60,7 @@
     "nodebb-plugin-spam-be-gone": "0.4.10",
     "nodebb-plugin-sso-facebook": "3.3.2",
     "nodebb-plugin-sso-github2": "2.0.2",
-    "nodebb-plugin-sso-twitter": "2.3.2",
+    "nodebb-plugin-sso-twitter-with-email": "0.1.0",
     "nodebb-rewards-essentials": "0.0.9",
     "nodebb-theme-lavender": "3.0.15",
     "nodebb-theme-persona": "4.1.95",
