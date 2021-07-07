@@ -765,7 +765,7 @@ describe('User', function () {
 			});
 		});
 
-		it('should return false if user/group does not exists', function (done) {
+		it('should return false if user/group does not exist', function (done) {
 			socketUser.exists({uid: testUid}, {username: 'doesnot exist'}, function (err, exists) {
 				assert.ifError(err);
 				assert(!exists);
