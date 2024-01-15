@@ -11,6 +11,47 @@
 	var semver = require('semver');
 	var db;
 
+	function createMongoClient() {
+		var MongoClient;
+		try {
+			MongoClient = require('mongodb').MongoClient;
+		} catch (err) {
+			winston.error('Unable to initialize MongoDB! Is MongoDB installed? Error :' + err.message);
+			throw err;
+		}
+
+		var usernamePassword = '';
+		if (nconf.get('mongo:username') && nconf.get('mongo:password')) {
+			usernamePassword = nconf.get('mongo:username') + ':' + encodeURIComponent(nconf.get('mongo:password')) + '@';
+		}
+
+		// Sensible defaults for Mongo, if not set
+		if (!nconf.get('mongo:host')) {
+			nconf.set('mongo:host', '127.0.0.1');
+		}
+		if (!nconf.get('mongo:port')) {
+			nconf.set('mongo:port', 27017);
+		}
+		if (!nconf.get('mongo:database')) {
+			nconf.set('mongo:database', 'nodebb');
+		}
+
+		var hosts = nconf.get('mongo:host').split(',');
+		var ports = nconf.get('mongo:port').toString().split(',');
+		var servers = [];
+
+		for (var i = 0; i < hosts.length; i++) {
+			servers.push(hosts[i] + ':' + ports[i]);
+		}
+
+		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + (nconf.get('mongo:authDatabase') || nconf.get('mongo:database'));
+		winston.info('Connecting to ' + connString);
+		
+		let connOptions = {};
+		connOptions = _.deepExtend((nconf.get('mongo:options') || {}), connOptions);		
+		return new MongoClient(connString, connOptions); 	
+	}
+
 	_.mixin(require('underscore.deep'));
 
 	module.questions = [
@@ -45,60 +86,12 @@
 
 	module.helpers = module.helpers || {};
 	module.helpers.mongo = require('./mongo/helpers');
-
-	module.init = function (callback) {
+	let mongoClient
+	module.init = function (callback) {		
 		callback = callback || function () { };
-		var mongoClient;
-		try {
-			mongoClient = require('mongodb').MongoClient;
-		} catch (err) {
-			winston.error('Unable to initialize MongoDB! Is MongoDB installed? Error :' + err.message);
-			return callback(err);
-		}
-
-		var usernamePassword = '';
-		if (nconf.get('mongo:username') && nconf.get('mongo:password')) {
-			usernamePassword = nconf.get('mongo:username') + ':' + encodeURIComponent(nconf.get('mongo:password')) + '@';
-		}
-
-		// Sensible defaults for Mongo, if not set
-		if (!nconf.get('mongo:host')) {
-			nconf.set('mongo:host', '127.0.0.1');
-		}
-		if (!nconf.get('mongo:port')) {
-			nconf.set('mongo:port', 27017);
-		}
-		if (!nconf.get('mongo:database')) {
-			nconf.set('mongo:database', 'nodebb');
-		}
-
-		var hosts = nconf.get('mongo:host').split(',');
-		var ports = nconf.get('mongo:port').toString().split(',');
-		var servers = [];
-
-		for (var i = 0; i < hosts.length; i++) {
-			servers.push(hosts[i] + ':' + ports[i]);
-		}
-
-		var connString = 'mongodb://' + usernamePassword + servers.join() + '/' + (nconf.get('mongo:authDatabase') || nconf.get('mongo:database'));
-		winston.info('Connecting to ' + connString);
-
-		var connOptions = {
-			server: {
-				poolSize: parseInt(nconf.get('mongo:poolSize'), 10) || 10
-			}
-		};
-
-		connOptions = _.deepExtend((nconf.get('mongo:options') || {}), connOptions);
-
-		mongoClient.connect(connString, connOptions, function (err, _db) {
-			if (err) {
-				winston.error("NodeBB could not connect to your Mongo database. Mongo returned the following error: " + err.message);
-				return callback(err);
-			}			
-
-			db = _db;
-
+		const mongoClient = createMongoClient()
+		mongoClient.connect().then(() => {
+			db = mongoClient.db(nconf.get('mongo:database'));
 			if (nconf.get('mongo:authDatabase')) {
 				db = db.db(nconf.get('mongo:database'));
 			}
@@ -110,7 +103,7 @@
 			require('./mongo/sets')(db, module);
 			require('./mongo/sorted')(db, module);
 			require('./mongo/list')(db, module);
-
+			
 			callback();
 
 			/*if (nconf.get('mongo:password') && nconf.get('mongo:username')) {
@@ -124,10 +117,15 @@
 				winston.warn('You have no mongo password setup!');
 				callback();
 			}*/
+		}).catch((err) => {
+			if (err) {
+				winston.error("NodeBB could not connect to your Mongo database. Mongo returned the following error: " + err.message);
+				return callback(err);
+			}	
 		});
 	};
 
-	module.initSessionStore = function (callback) {
+	module.initSessionStore = function (callback) {		
 		var meta = require('../meta');
 		var sessionStore;
 
@@ -145,17 +143,17 @@
 				ttl: ttl
 			});
 		} else if (nconf.get('mongo')) {
-			sessionStore = require('connect-mongo')(session);
-			module.sessionStore = new sessionStore({
-				db: db,
-				ttl: ttl
+			sessionStore = require('connect-mongo').create({
+				ttl,
+				clientPromise: createMongoClient().connect(),
 			});
+			module.sessionStore = sessionStore
 		}
 
 		callback();
 	};
 
-	module.createIndices = function (callback) {
+	module.createIndices = function (callback) {		
 		function createIndex(collection, index, options, callback) {
 			module.client.collection(collection).createIndex(index, options, callback);
 		}
@@ -180,7 +178,7 @@
 		});
 	};
 
-	module.checkCompatibility = function (callback) {
+	module.checkCompatibility = function (callback) {		
 		var mongoPkg = require.main.require('./node_modules/mongodb/package.json');
 
 		if (semver.lt(mongoPkg.version, '2.0.0')) {
@@ -190,7 +188,7 @@
 		callback();
 	};
 
-	module.info = function (db, callback) {
+	module.info = function (db, callback) {		
 		if (!db) {
 			return callback();
 		}
@@ -251,7 +249,9 @@
 	};
 
 	module.close = function () {
-		db.close();
+		if (mongoClient) {
+			mongoClient.close();
+		}
 	};
 
 } (exports));

@@ -16,7 +16,7 @@ module.exports = function (db, module) {
 		var project = { _id: 0, count: '$count' };
 		pipeline.push({	$project: project });
 
-		db.collection('objects').aggregate(pipeline, function (err, data) {
+		util.callbackify(() => db.collection('objects').aggregate(pipeline))(function (err, data) {
 			callback(err, Array.isArray(data) && data.length ? data[0].count : 0);
 		});
 	};
@@ -67,7 +67,7 @@ module.exports = function (db, module) {
 		}
 		pipeline.push({	$project: project });
 
-		db.collection('objects').aggregate(pipeline, function (err, data) {
+		util.callbackify(() => db.collection('objects').aggregate(pipeline))(function (err, data) {
 			if (err || !data) {
 				return callback(err);
 			}

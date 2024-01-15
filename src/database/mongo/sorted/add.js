@@ -1,4 +1,5 @@
 'use strict';
+const util = require('util')
 
 module.exports = function (db, module) {
 
@@ -15,7 +16,7 @@ module.exports = function (db, module) {
 
 		value = helpers.valueToString(value);
 
-		db.collection('objects').update({_key: key, value: value}, {$set: {score: parseFloat(score)}}, {upsert:true, w: 1}, function (err) {
+		util.callbackify(() => db.collection('objects').updateOne({_key: key, value: value}, {$set: {score: parseFloat(score)}}, {upsert:true, w: 1}))(function (err) {
 			if (err && err.message.startsWith('E11000 duplicate key error')) {
 				return process.nextTick(module.sortedSetAdd, key, score, value, callback);
 			}
@@ -39,7 +40,7 @@ module.exports = function (db, module) {
 			bulk.find({_key: key, value: values[i]}).upsert().updateOne({$set: {score: parseFloat(scores[i])}});
 		}
 
-		bulk.execute(function (err) {
+		util.callbackify(() => bulk.execute())(function (err) {
 			callback(err);
 		});
 	}
@@ -57,7 +58,7 @@ module.exports = function (db, module) {
 			bulk.find({_key: keys[i], value: value}).upsert().updateOne({$set: {score: parseFloat(score)}});
 		}
 
-		bulk.execute(function (err) {
+		util.callbackify(() => bulk.execute())(function (err) {
 			callback(err);
 		});
 	};

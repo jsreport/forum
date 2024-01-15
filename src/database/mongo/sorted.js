@@ -2,6 +2,7 @@
 
 var async = require('async');
 var utils = require('../../../public/src/utils');
+const util = require('util')
 
 module.exports = function (db, module) {
 	var helpers = module.helpers.mongo;
@@ -46,11 +47,11 @@ module.exports = function (db, module) {
 			limit = 0;
 		}
 
-		db.collection('objects').find({_key: key}, {fields: fields})
+		util.callbackify(() => db.collection('objects').find({_key: key}, {fields: fields})
 			.limit(limit)
 			.skip(start)
 			.sort({score: sort})
-			.toArray(function (err, data) {
+			.toArray())(function (err, data) {
 				if (err || !data) {
 					return callback(err);
 				}
@@ -104,11 +105,11 @@ module.exports = function (db, module) {
 			fields.score = 1;
 		}
 
-		db.collection('objects').find(query, {fields: fields})
+		util.callbackify(() => db.collection('objects').find(query, {fields: fields})
 			.limit(count)
 			.skip(start)
 			.sort({score: sort})
-			.toArray(function (err, data) {
+			.toArray())(function (err, data) {
 				if (err) {
 					return callback(err);
 				}
@@ -137,7 +138,7 @@ module.exports = function (db, module) {
 			query.score.$lte = max;
 		}
 
-		db.collection('objects').count(query, function (err, count) {
+		util.callbackify(() => db.collection('objects').count(query))(function (err, count) {
 			callback(err, count ? count : 0);
 		});
 	};
@@ -146,7 +147,7 @@ module.exports = function (db, module) {
 		if (!key) {
 			return callback(null, 0);
 		}
-		db.collection('objects').count({_key: key}, function (err, count) {
+		util.callbackify(() => db.collection('objects').count({_key: key}))(function (err, count) {
 			count = parseInt(count, 10);
 			callback(err, count ? count : 0);
 		});
@@ -161,7 +162,7 @@ module.exports = function (db, module) {
 			{ $group: { _id: {_key: '$_key'}, count: { $sum: 1 } } },
 			{ $project: { _id: 1, count: '$count' } }
 		];
-		db.collection('objects').aggregate(pipeline, function (err, results) {
+		util.callbackify(() => db.collection('objects').aggregate(pipeline))(function (err, results) {
 			if (err) {
 				return callback(err);
 			}
@@ -244,7 +245,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		value = helpers.valueToString(value);
-		db.collection('objects').findOne({_key: key, value: value}, {fields:{_id: 0, score: 1}}, function (err, result) {
+		util.callbackify(() => db.collection('objects').findOne({_key: key, value: value}, {fields:{_id: 0, score: 1}}))(function (err, result) {
 			callback(err, result ? result.score : null);
 		});
 	};
@@ -254,7 +255,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		value = helpers.valueToString(value);
-		db.collection('objects').find({_key:{$in:keys}, value: value}, {_id:0, _key:1, score: 1}).toArray(function (err, result) {
+		util.callbackify(() => db.collection('objects').find({_key:{$in:keys}, value: value}, {_id:0, _key:1, score: 1}).toArray())(function (err, result) {
 			if (err) {
 				return callback(err);
 			}
@@ -277,7 +278,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		values = values.map(helpers.valueToString);
-		db.collection('objects').find({_key: key, value: {$in: values}}, {_id: 0, value: 1, score: 1}).toArray(function (err, result) {
+		util.callbackify(() => db.collection('objects').find({_key: key, value: {$in: values}}, {_id: 0, value: 1, score: 1}).toArray())(function (err, result) {
 			if (err) {
 				return callback(err);
 			}
@@ -304,7 +305,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		value = helpers.valueToString(value);
-		db.collection('objects').findOne({_key: key, value: value}, {_id: 0, value: 1}, function (err, result) {
+		util.callbackify(() => db.collection('objects').findOne({_key: key, value: value}, {_id: 0, value: 1}))(function (err, result) {
 			callback(err, !!result);
 		});
 	};
@@ -314,7 +315,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		values = values.map(helpers.valueToString);
-		db.collection('objects').find({_key: key, value: {$in: values}}, {fields: {_id: 0, value: 1}}).toArray(function (err, results) {
+		util.callbackify(() => db.collection('objects').find({_key: key, value: {$in: values}}, {fields: {_id: 0, value: 1}}).toArray())(function (err, results) {
 			if (err) {
 				return callback(err);
 			}
@@ -335,7 +336,7 @@ module.exports = function (db, module) {
 			return callback();
 		}
 		value = helpers.valueToString(value);
-		db.collection('objects').find({_key: {$in: keys}, value: value}, {fields: {_id: 0, _key: 1, value: 1}}).toArray(function (err, results) {
+		util.callbackify(() => db.collection('objects').find({_key: {$in: keys}, value: value}, {fields: {_id: 0, _key: 1, value: 1}}).toArray())(function (err, results) {
 			if (err) {
 				return callback(err);
 			}
@@ -355,7 +356,7 @@ module.exports = function (db, module) {
 		if (!Array.isArray(keys) || !keys.length) {
 			return callback(null, []);
 		}
-		db.collection('objects').find({_key: {$in: keys}}, {_id: 0, _key: 1, value: 1}).toArray(function (err, data) {
+		util.callbackify(() => db.collection('objects').find({_key: {$in: keys}}, {_id: 0, _key: 1, value: 1}).toArray())(function (err, data) {
 			if (err) {
 				return callback(err);
 			}
@@ -383,7 +384,7 @@ module.exports = function (db, module) {
 		value = helpers.valueToString(value);
 		data.score = parseFloat(increment);
 
-		db.collection('objects').findAndModify({_key: key, value: value}, {}, {$inc: data}, {new: true, upsert: true}, function (err, result) {
+		util.callbackify(() => db.collection('objects').findOneAndUpdate({_key: key, value: value}, {$inc: data}, {returnDocument: 'after', includeResultMetadata: true, upsert: true}))(function (err, result) {
 			// if there is duplicate key error retry the upsert
 			// https://github.com/NodeBB/NodeBB/issues/4467
 			// https://jira.mongodb.org/browse/SERVER-14322
@@ -419,11 +420,11 @@ module.exports = function (db, module) {
 		var query = {_key: key};
 		buildLexQuery(query, min, max);
 
-		db.collection('objects').find(query, {_id: 0, value: 1})
+		util.callbackify(() => db.collection('objects').find(query, {_id: 0, value: 1})
 			.sort({value: sort})
 			.skip(start)
 			.limit(count === -1 ? 0 : count)
-			.toArray(function (err, data) {
+			.toArray())(function (err, data) {
 				if (err) {
 					return callback(err);
 				}
@@ -440,7 +441,7 @@ module.exports = function (db, module) {
 		var query = {_key: key};
 		buildLexQuery(query, min, max);
 
-		db.collection('objects').remove(query, function (err) {
+		util.callbackify(() => db.collection('objects').remove(query))(function (err) {
 			callback(err);
 		});
 	};
@@ -480,7 +481,7 @@ module.exports = function (db, module) {
 				return !done;
 			},
 			function (next) {
-				cursor.next(function (err, item) {
+				util.callbackify(() => cursor.next())(function (err, item) {
 					if (err) {
 						return next(err);
 					}

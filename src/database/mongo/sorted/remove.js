@@ -1,4 +1,5 @@
 'use strict';
+const util = require('util')
 
 module.exports = function (db, module) {
 
@@ -15,10 +16,10 @@ module.exports = function (db, module) {
 
 		if (Array.isArray(value)) {
 			value = value.map(helpers.valueToString);
-			db.collection('objects').remove({_key: key, value: {$in: value}}, done);
+			util.callbackify(() => db.collection('objects').deleteMany({_key: key, value: {$in: value}}))(done);
 		} else {
 			value = helpers.valueToString(value);
-			db.collection('objects').remove({_key: key, value: value}, done);
+			util.callbackify(() => db.collection('objects').deleteMany({_key: key, value: value}))(done);
 		}
 	};
 
@@ -29,7 +30,7 @@ module.exports = function (db, module) {
 		}
 		value = helpers.valueToString(value);
 
-		db.collection('objects').remove({_key: {$in: keys}, value: value}, function (err) {
+		util.callbackify(() => db.collection('objects').deleteMany({_key: {$in: keys}, value: value}))(function (err) {
 			callback(err);
 		});
 	};
@@ -49,7 +50,7 @@ module.exports = function (db, module) {
 			query.score.$lte = max;
 		}
 
-		db.collection('objects').remove(query, function (err) {
+		util.callbackify(() => db.collection('objects').deleteMany(query))(function (err) {
 			callback(err);
 		});
 	};

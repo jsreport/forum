@@ -14,7 +14,7 @@ module.exports = function (db, module) {
 
 	module.emptydb = function (callback) {
 		callback = callback || helpers.noop;
-		db.collection('objects').remove({}, function (err) {
+		db.collection('objects').deleteMany({}, function (err) {
 			callback(err);
 		});
 	};
@@ -33,7 +33,7 @@ module.exports = function (db, module) {
 		if (!key) {
 			return callback();
 		}
-		db.collection('objects').remove({_key: key}, function (err, res) {
+		db.collection('objects').removeOne({_key: key}, function (err, res) {
 			callback(err);
 		});
 	};
@@ -43,19 +43,19 @@ module.exports = function (db, module) {
 		if (!Array.isArray(keys) || !keys.length) {
 			return callback();
 		}
-		db.collection('objects').remove({_key: {$in: keys}}, function (err, res) {
+		db.collection('objects').deleteMany({_key: {$in: keys}}, function (err, res) {
 			callback(err);
 		});
 	};
 
-	module.get = function (key, callback) {
+	module.get = function (key, callback) {		
 		if (!key) {
 			return callback();
 		}
 		module.getObjectField(key, 'value', callback);
 	};
 
-	module.set = function (key, value, callback) {
+	module.set = function (key, value, callback) {		
 		callback = callback || helpers.noop;
 		if (!key) {
 			return callback();
@@ -64,19 +64,19 @@ module.exports = function (db, module) {
 		module.setObject(key, data, callback);
 	};
 
-	module.increment = function (key, callback) {
+	module.increment = function (key, callback) {		
 		callback = callback || helpers.noop;
 		if (!key) {
 			return callback();
 		}
-		db.collection('objects').findAndModify({_key: key}, {}, {$inc: {value: 1}}, {new: true, upsert: true}, function (err, result) {
+		db.collection('objects').findOneAndUpdate({_key: key}, {$inc: {value: 1}}, {returnDocument: 'after', includeResultMetadata: true, upsert: true}, function (err, result) {
 			callback(err, result && result.value ? result.value.value : null);
 		});
 	};
 
-	module.rename = function (oldKey, newKey, callback) {
+	module.rename = function (oldKey, newKey, callback) {		
 		callback = callback || helpers.noop;
-		db.collection('objects').update({_key: oldKey}, {$set:{_key: newKey}}, {multi: true}, function (err, res) {
+		db.collection('objects').updateMany({_key: oldKey}, {$set:{_key: newKey}}, {multi: true}, function (err, res) {
 			callback(err);
 		});
 	};
