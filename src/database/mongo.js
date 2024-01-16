@@ -91,10 +91,7 @@
 		callback = callback || function () { };
 		const mongoClient = createMongoClient()
 		mongoClient.connect().then(() => {
-			db = mongoClient.db(nconf.get('mongo:database'));
-			if (nconf.get('mongo:authDatabase')) {
-				db = db.db(nconf.get('mongo:database'));
-			}
+			db = mongoClient.db(nconf.get('mongo:database'));			
 
 			module.client = db;
 
