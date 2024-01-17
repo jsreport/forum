@@ -1,20 +1,21 @@
 "use strict";
 
 var winston = require('winston');
+const util = require('util');
 
 module.exports = function (db, module) {
 	var helpers = module.helpers.mongo;
 
 	module.flushdb = function (callback) {
 		callback = callback || helpers.noop;
-		db.dropDatabase(function (err) {
+		util.callbackify(() => db.dropDatabase())(function (err) {
 			callback(err);
 		});
 	};
 
 	module.emptydb = function (callback) {
 		callback = callback || helpers.noop;
-		db.collection('objects').deleteMany({}, function (err) {
+		util.callbackify(() => db.collection('objects').deleteMany({}))(function (err) {
 			callback(err);
 		});
 	};
@@ -23,7 +24,7 @@ module.exports = function (db, module) {
 		if (!key) {
 			return callback();
 		}
-		db.collection('objects').findOne({_key: key}, function (err, item) {
+		util.callbackify(() => db.collection('objects').findOne({_key: key}))(function (err, item) {
 			callback(err, item !== undefined && item !== null);
 		});
 	};
@@ -33,7 +34,7 @@ module.exports = function (db, module) {
 		if (!key) {
 			return callback();
 		}
-		db.collection('objects').removeOne({_key: key}, function (err, res) {
+		util.callbackify(() => db.collection('objects').deleteOne({_key: key}))(function (err, res) {
 			callback(err);
 		});
 	};
@@ -43,7 +44,7 @@ module.exports = function (db, module) {
 		if (!Array.isArray(keys) || !keys.length) {
 			return callback();
 		}
-		db.collection('objects').deleteMany({_key: {$in: keys}}, function (err, res) {
+		util.callbackify(() => db.collection('objects').deleteMany({_key: {$in: keys}}))(function (err, res) {
 			callback(err);
 		});
 	};
@@ -69,14 +70,14 @@ module.exports = function (db, module) {
 		if (!key) {
 			return callback();
 		}
-		db.collection('objects').findOneAndUpdate({_key: key}, {$inc: {value: 1}}, {returnDocument: 'after', includeResultMetadata: true, upsert: true}, function (err, result) {
+		util.callbackify(() => db.collection('objects').findOneAndUpdate({_key: key}, {$inc: {value: 1}}, {returnDocument: 'after', includeResultMetadata: true, upsert: true}))(function (err, result) {
 			callback(err, result && result.value ? result.value.value : null);
 		});
 	};
 
 	module.rename = function (oldKey, newKey, callback) {		
 		callback = callback || helpers.noop;
-		db.collection('objects').updateMany({_key: oldKey}, {$set:{_key: newKey}}, {multi: true}, function (err, res) {
+		util.callbackify(() => db.collection('objects').updateMany({_key: oldKey}, {$set:{_key: newKey}}, {multi: true}))(function (err, res) {
 			callback(err);
 		});
 	};
