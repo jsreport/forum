@@ -36,24 +36,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: jsreport/forum:${{ github.event.release.tag_name }}
-    
-      - shell: bash   
-        env:     
-          KUBERNETES: ${{ secrets.KUBERNETES }} 
-          TAG: ${{ github.event.release.tag_name }}       
-        run: |    
-          git clone https://github.com/pofider/kubernetes.git
-          cd kubernetes 
-          git checkout -b forum-${TAG}       
-          git config --global user.name "pofider"
-          git config --global user.email "honza.pofider@seznam.cz"
-
-          sed -i 's/'"jsreport\/forum"'\:\(.*\)/'"jsreport\/forum"'\:'"${TAG}"'/' ./config/staging/forum.yaml
-          sed -i 's/'"jsreport\/forum"'\:\(.*\)/'"jsreport\/forum"'\:'"${TAG}"'/' ./config/prod/forum.yaml
-          git add config/staging/forum.yaml
-          git add config/prod/forum.yaml
-          git commit -m "Update the forum application"
-
-          remote_repo="https://pofider:${KUBERNETES}@github.com/pofider/kubernetes.git"
-          git push "${remote_repo}" HEAD:forum-${TAG}      
+          tags: jsreport/forum:${{ github.event.release.tag_name }}   
+   
