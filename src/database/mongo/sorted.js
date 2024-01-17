@@ -441,7 +441,7 @@ module.exports = function (db, module) {
 		var query = {_key: key};
 		buildLexQuery(query, min, max);
 
-		util.callbackify(() => db.collection('objects').remove(query))(function (err) {
+		util.callbackify(() => db.collection('objects').deleteMany(query))(function (err) {
 			callback(err);
 		});
 	};
